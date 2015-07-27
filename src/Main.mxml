@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+                       xmlns:s="library://ns.adobe.com/flex/spark"
+                       xmlns:mx="library://ns.adobe.com/flex/mx"
+					   initialize="windowedapplication_initializeHandler(event)">
+	<fx:Script>
+		<![CDATA[
+
+		import mx.collections.ArrayCollection;
+		import mx.events.FlexEvent;
+
+		private const APP_TITLE:String = "Калькулятор мебели";
+
+		private const ARRAY1:ArrayCollection = new ArrayCollection([
+				{label:"Прямой", data:1},
+				{label:"Угловой", data:2},
+				{label:"П-Образный", data:3 }
+		]);
+
+		protected function windowedapplication_initializeHandler(event:FlexEvent):void
+		{
+			this.title = APP_TITLE;
+		}
+
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+
+	<s:Panel width="100%" height="100%" title="{APP_TITLE}">
+
+		<s:Form width="200">
+			<s:FormItem label="Форма вашего нового шкафа">
+				<s:DropDownList dataProvider="{ARRAY1}" requireSelection="true" />
+			</s:FormItem>
+		</s:Form>
+
+		<s:controlBarContent>
+			<s:HGroup width="100%">
+				<mx:Spacer width="100%"/>
+				<s:Button label="Рассчитать"/>
+			</s:HGroup>
+		</s:controlBarContent>
+	</s:Panel>
+
+</s:WindowedApplication>
