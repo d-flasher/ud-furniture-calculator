@@ -2,7 +2,7 @@
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
                        xmlns:s="library://ns.adobe.com/flex/spark"
                        xmlns:mx="library://ns.adobe.com/flex/mx"
-					   width="600" height="700"
+					   width="1000" height="700"
 					   initialize="windowedapplication_initializeHandler(event)">
 	<fx:Script>
 		<![CDATA[
@@ -12,19 +12,6 @@
 		import mx.events.ResizeEvent;
 
 		private const APP_TITLE:String = "Калькулятор мебели";
-
-		private const ARRAY1:ArrayCollection = new ArrayCollection([
-				{label:"Прямой", data:1},
-				{label:"Угловой", data:2},
-				{label:"П-Образный", data:3 }
-		]);
-
-		private const ARRAY2:ArrayCollection = new ArrayCollection([
-				{label:"У стены", data:1},
-				{label:"В углу", data:2},
-				{label:"Отдельно стоящий", data:3 },
-				{label:"Встроенный куда-либо", data:4 }
-		]);
 
 		protected function windowedapplication_initializeHandler(event:FlexEvent):void
 		{
@@ -50,40 +37,155 @@
 		<s:Scroller>
 			<s:Group id="formContainer" height="{mainPanel.contentGroup.height}">
 				<s:Form>
+
+					<s:FormHeading label="Базовое"/>
+
 					<s:FormItem label="Форма вашего нового шкафа">
-						<s:DropDownList dataProvider="{ARRAY1}" requireSelection="true" />
+						<s:DropDownList requireSelection="true">
+							<s:ArrayList id="formId">
+								<fx:Object label="Прямой"/>
+								<fx:Object label="Угловой"/>
+								<fx:Object label="П-Образный"/>
+							</s:ArrayList>
+						</s:DropDownList>
 					</s:FormItem>
 
 					<s:FormItem label="Место расположения шкафа">
-						<s:DropDownList dataProvider="{ARRAY2}" requireSelection="true" />
+						<s:DropDownList requireSelection="true">
+							<s:ArrayList>
+								<fx:Object label="У стены"/>
+								<fx:Object label="В углу"/>
+								<fx:Object label="Отдельно стоящий"/>
+								<fx:Object label="Встроенный куда-либо"/>
+							</s:ArrayList>
+						</s:DropDownList>
+					</s:FormItem>
+
+					<s:FormItem label="Длина шкафа общая*:">
+						<s:TextInput/>
+					</s:FormItem>
+
+					<s:FormItem label="Высотка шкафа*:">
+						<s:TextInput/>
+					</s:FormItem>
+
+					<s:FormItem label="Глубина шкафа*:">
+						<s:TextInput/>
 					</s:FormItem>
 
 					<s:FormHeading label="Выбираем двери"/>
 
 					<s:FormItem label="Тип дверей шкафа">
-						<s:DropDownList dataProvider="{ARRAY2}" requireSelection="true" />
+						<s:DropDownList requireSelection="true">
+							<s:ArrayList>
+								<fx:Object label="Раздвижные - КУПЕ"/>
+								<fx:Object label="Распашные обычные"/>
+							</s:ArrayList>
+						</s:DropDownList>
 					</s:FormItem>
 
 					<s:FormItem label="Общее кол-во дверей, шт">
-						<s:DropDownList dataProvider="{ARRAY2}" requireSelection="true" />
+						<s:NumericStepper minimum="2" maximum="5" />
 					</s:FormItem>
 
 					<s:FormItem label="Материал фасада">
 						<s:VGroup>
 							<s:CheckBox label="ДСП" />
-							<s:CheckBox label="Ламинат" />
-							<s:CheckBox label="Ламинат" />
-							<s:CheckBox label="Ламинат" />
-							<s:CheckBox label="Ламинат" />
-							<s:CheckBox label="Ламинат" />
-							<s:CheckBox label="Ламинат" />
-							<s:CheckBox label="Ламинат" />
-							<s:CheckBox label="Ламинат" />
-							<s:CheckBox label="Ламинат" />
-							<s:CheckBox label="Ламинат" />
-							<s:CheckBox label="Ламинат" />
-							<s:CheckBox label="Ламинат" />
+							<s:CheckBox label="Зеркало простое" />
+							<s:CheckBox label="Зеркало цветное" />
+							<s:CheckBox label="Зеркало с узором (пескоструйка)" />
+							<s:CheckBox label="Зеркало с художественным рисунком" />
+							<s:CheckBox label="Зеркало с фотовитражем" />
+							<s:CheckBox label="Стекло простое" />
+							<s:CheckBox label="Стекло цветное" />
+							<s:CheckBox label="Стекло с узором (пескоструйка)" />
+							<s:CheckBox label="Стекло с художественным рисунком" />
+							<s:CheckBox label="Стекло с фотовитражем" />
+							<s:CheckBox label="Стекло матовое" />
+							<s:CheckBox label="Стекло акриловое" />
+							<s:CheckBox label="Стекло разноцветное, покрытое пленкой" />
+							<s:CheckBox label="Ротанг" />
+							<s:CheckBox label="Бамбук" />
 						</s:VGroup>
+					</s:FormItem>
+
+					<s:FormHeading label="Внутреннее пространство шкафа"/>
+
+					<s:FormItem label="Кол-во вертикальных секций, шт">
+						<s:NumericStepper minimum="2" maximum="5" />
+					</s:FormItem>
+
+					<s:FormItem label="Общее кол-во полок во всех секциях, шт">
+						<s:NumericStepper minimum="2" maximum="5" />
+					</s:FormItem>
+
+					<s:FormHeading label="--"/>
+
+					<s:FormItem label="Кол-во выдвижных ящиков, шт">
+						<s:NumericStepper minimum="2" maximum="5" />
+					</s:FormItem>
+
+					<s:FormItem label="Кол-во отделов с продольным вешалом, шт">
+						<s:NumericStepper minimum="2" maximum="5" />
+					</s:FormItem>
+
+					<s:FormItem label="Кол-во отделов с поперечным вешалом, шт">
+						<s:NumericStepper minimum="2" maximum="5" />
+						<s:helpContent>
+							<s:Label text="для шкафа до 40 см глубиной"/>
+						</s:helpContent>
+					</s:FormItem>
+
+					<s:FormItem label="Какие внешние панели шкафа включить в рассчет?:">
+						<s:VGroup>
+							<s:CheckBox label="Задняя стенка" />
+							<s:CheckBox label="Левая стенка" />
+							<s:CheckBox label="Правая стенка" />
+							<s:CheckBox label='"Крыша" шкафа' />
+							<s:CheckBox label='"Пол" шкафа' />
+						</s:VGroup>
+					</s:FormItem>
+
+					<s:FormItem label="Какие из следующих аксессуаров и приятных мелочей включить в рассчет?:">
+						<s:VGroup>
+							<s:CheckBox label="Козырек" />
+							<s:CheckBox label="Подсветка снаружи" />
+							<s:CheckBox label="Подсветка внутри" />
+							<s:CheckBox label="Мягкий доводчик дверей" />
+							<s:CheckBox label="Мягкий доводчик ящиков" />
+							<s:CheckBox label="Подъемник для вешало (пантограф)" />
+							<s:CheckBox label="Выдвижное поперечное вешало" />
+							<s:CheckBox label="Встроенная гладильная доска" />
+							<s:CheckBox label="Выдвижная корзина для белья" />
+							<s:CheckBox label="Шкафчик для мелких вещей" />
+							<s:CheckBox label="Ключница" />
+							<s:CheckBox label="Галстучница" />
+							<s:CheckBox label="Брючница" />
+							<s:CheckBox label="Обувница" />
+							<s:CheckBox label="Розетка 220 вольт" />
+						</s:VGroup>
+					</s:FormItem>
+
+					<s:FormItem label="Персональные особенности шкафа и Ваши пожелания:">
+						<s:TextArea/>
+					</s:FormItem>
+
+					<s:FormHeading label="Ваши координаты для связи:"/>
+
+					<s:FormItem label="Имя*:">
+						<s:TextInput/>
+					</s:FormItem>
+
+					<s:FormItem label="Контактный телефон*:">
+						<s:TextInput/>
+					</s:FormItem>
+
+					<s:FormItem label="Город или населенный пункт:">
+						<s:TextInput/>
+					</s:FormItem>
+
+					<s:FormItem label="E-mail:">
+						<s:TextInput/>
 					</s:FormItem>
 
 				</s:Form>
