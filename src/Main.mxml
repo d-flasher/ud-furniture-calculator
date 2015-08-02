@@ -7,46 +7,92 @@
 	<fx:Script>
 		<![CDATA[
 
+		import data.DoorMaterialData;
+		import flash.events.Event;
 		import flash.events.MouseEvent;
 		import mx.collections.ArrayCollection;
 		import mx.events.FlexEvent;
 		import mx.events.ResizeEvent;
+		import spark.components.Button;
 		import spark.components.DropDownList;
 		import spark.components.FormItem;
-		import spark.components.Button;
 		import spark.layouts.HorizontalLayout;
+		import spark.layouts.supportClasses.LayoutBase;
+		import spark.layouts.VerticalLayout;
 
-			private const DOOR_TYPES:ArrayCollection = new ArrayCollection([
-				{label: "ДСП" },
-				{label: "Зеркало" }
-			]);
+		private const CARCASS_PRICE:Number = 0.29; // копус (см2)
+		private const DOOR_CARCASS_PRICE:Number = 2784; // корпус двери (шт)
+		private const RACK_PRICE:Number = 1028; // стойка (шт)
+		private const SHELF_PRICE:Number = 386; // полка (шт)
+		private const DRAWER_PRICE:Number = 948; // ящик (шт)
+		private const BACKLIGHT_PRICE:Number = 740; // подсветка (за 3 штуки)
+
+		public static const DOOR_TYPES:ArrayCollection = new ArrayCollection([
+			new DoorMaterialData("ДСП", 0.29 /*(см2)*/),
+			new DoorMaterialData("Зеркало", 0.60 /*(см2)*/)
+		]);
+
+		private function calculate():void
+		{
+			// base
+			var baseArea:Number = 2 * (baseWidthNStepper.value * baseDepthNStepper.value) + 2 * (baseHeightNStepper.value * baseDepthNStepper.value);
+			var basePrice:Number = baseArea * CARCASS_PRICE;
+
+			// doors
+			var doorsTotalPrice:Number = 0;
+			if (doorsItemsContainer.numElements > 0)
+			{
+				var oneDoorArea:Number = (baseWidthNStepper.value * baseHeightNStepper.value) / doorsItemsContainer.numElements;
+
+				for (var i:int = 0; i < doorsItemsContainer.numElements; i++)
+				{
+					var doorItem:DoorFormItem = doorsItemsContainer.getElementAt(i) as DoorFormItem;
+					if (doorItem == null) continue;
+
+					var doorTypeData:DoorMaterialData = doorItem.selectedDoorType;
+					doorsTotalPrice += DOOR_CARCASS_PRICE + oneDoorArea * doorTypeData.price;
+				}
+			}
+
+			// rack
+			var rackPrice:Number = rackNStepper.value * RACK_PRICE;
+
+			// shelf
+			var shelfPrice:Number = shelfNStepper.value * SHELF_PRICE;
+
+			// drawer
+			var drawerPrice:Number = drawerNStepper.value * DRAWER_PRICE;
+
+			// backlight
+			var backlightPrice:Number = (backlightCheckbox.selected) ? BACKLIGHT_PRICE : 0;
+
+			var resultPrice:Number = basePrice
+				+ doorsTotalPrice
+				+ rackPrice
+				+ shelfPrice
+				+ drawerPrice
+				+ backlightPrice;
+
+			totalPriceLabel.text = String(Math.round(resultPrice)) + ' руб.';
+		}
+
+		private function calculateButtonClick(event:MouseEvent):void
+		{
+			calculate();
+		}
 
 		private function addDoorButtonClick(event:MouseEvent):void
 		{
-			var doorFormItem:FormItem = new FormItem();
-			doorFormItem.layout = new HorizontalLayout();
-
-			var doorTypeMenu:DropDownList = new DropDownList();
-			doorTypeMenu.dataProvider = DOOR_TYPES;
-			doorTypeMenu.requireSelection = true;
-			doorFormItem.addElement(doorTypeMenu);
-
-			var removeDoorItemButton:Button = new Button();
-			removeDoorItemButton.alpha = 0.6
-			removeDoorItemButton.label = "Удалить";
-			removeDoorItemButton.width = 70;
-			removeDoorItemButton.addEventListener(MouseEvent.CLICK, onRemoveDoorButtonClick);
-			doorFormItem.addElement(removeDoorItemButton);
-
+			var doorFormItem:DoorFormItem = new DoorFormItem();
+			doorFormItem.addEventListener(DoorFormItem.REMOVE_BUTTON_CLICK, onRemoveDoorButtonClick);
 			doorsItemsContainer.addElement(doorFormItem);
 
 			refreshDoorsLabel();
 		}
 
-		private function onRemoveDoorButtonClick(event:MouseEvent):void
+		private function onRemoveDoorButtonClick(event:Event):void
 		{
-			var button:Button = event.currentTarget as Button;
-			var formItem:FormItem = button.owner as FormItem;
+			var formItem:FormItem = event.currentTarget as FormItem;
 
 			doorsItemsContainer.removeElement(formItem);
 
@@ -76,6 +122,8 @@
 			this.title = APP_TITLE;
 
 			addEventListener(ResizeEvent.RESIZE, resizeHandler);
+
+			calculate();
 		}
 
 		protected function resizeHandler(event:ResizeEvent):void
@@ -85,6 +133,15 @@
 
 		]]>
 	</fx:Script>
+
+	<fx:Style>
+		@namespace "library://ns.adobe.com/flex/spark";
+
+		.blueTheme {
+			font-size: 20;
+			font-weight: bold;
+		}
+	</fx:Style>
 
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -96,21 +153,21 @@
 			<s:Group id="formContainer" width="{mainPanel.contentGroup.width}" height="{mainPanel.contentGroup.height}">
 				<s:Form width="100%">
 
-					<s:FormItem label="Длина шкафа общая*:">
-						<s:TextInput/>
+					<s:FormItem id="baseWidthFItem" label="Длина шкафа общая, см*:">
+						<s:NumericStepper id="baseWidthNStepper" minimum="0" maximum="100000"/>
 					</s:FormItem>
 
-					<s:FormItem label="Высотка шкафа*:">
-						<s:TextInput/>
+					<s:FormItem id="baseHeightFItem" label="Высотка шкафа, см*:">
+						<s:NumericStepper id="baseHeightNStepper" minimum="0" maximum="100000"/>
 					</s:FormItem>
 
-					<s:FormItem label="Глубина шкафа*:">
-						<s:TextInput/>
+					<s:FormItem id="baseDepthFItem" label="Глубина шкафа, см*:">
+						<s:NumericStepper id="baseDepthNStepper" minimum="0" maximum="100000"/>
 					</s:FormItem>
 
 					<mx:HRule width="100%"/>
 
-					<s:FormItem label="Двери">
+					<s:FormItem id="doorsFItem" label="Двери">
 						<!--<s:NumericStepper id="doorsNStepper" minimum="0" maximum="10" value="1" valueCommit="doorsNStepper_valueCommit(event)" />-->
 						<s:Button label="добавить дверь" alpha="0.6" click="addDoorButtonClick(event)" />
 						<s:VGroup id="doorsItemsContainer"/>
@@ -118,16 +175,33 @@
 
 					<mx:HRule width="100%"/>
 
-					<s:FormItem label=" Количество вертикальных стоек, шт.">
-						<s:NumericStepper minimum="0" maximum="60"/>
+					<s:FormItem id="rackFItem" label=" Количество вертикальных стоек, шт.">
+						<s:NumericStepper id="rackNStepper" minimum="0" maximum="60"/>
 					</s:FormItem>
 
-					<s:FormItem label="Количество полок, шт.">
-						<s:NumericStepper minimum="0" maximum="40"/>
+					<s:FormItem id="shelfFItem" label="Количество полок, шт.">
+						<s:NumericStepper id="shelfNStepper" minimum="0" maximum="40"/>
 					</s:FormItem>
 
-					<s:FormItem label="Количество ящиков, шт.">
-						<s:NumericStepper minimum="0" maximum="40"/>
+					<s:FormItem id="drawefFItem" label="Количество ящиков, шт.">
+						<s:NumericStepper id="drawerNStepper" minimum="0" maximum="40"/>
+					</s:FormItem>
+
+					<mx:HRule width="100%"/>
+
+					<s:FormItem label="Какие из следующих аксессуаров и приятных мелочей включить в рассчет?:">
+						<s:layout>
+							<s:VerticalLayout/>
+						</s:layout>
+						<s:CheckBox id="backlightCheckbox" label="Подсветка из 3-х ламп" />
+						<s:CheckBox label="???" />
+						<s:CheckBox label="???" />
+					</s:FormItem>
+
+					<mx:HRule width="100%"/>
+
+					<s:FormItem label="Результат:">
+						<s:Label id="totalPriceLabel" styleName="blueTheme" />
 					</s:FormItem>
 
 					<mx:HRule width="100%"/>
@@ -139,7 +213,7 @@
 		<s:controlBarContent>
 			<s:HGroup width="100%">
 				<mx:Spacer width="100%"/>
-				<s:Button label="Рассчитать"/>
+				<s:Button label="Рассчитать" click="calculateButtonClick(event)" />
 			</s:HGroup>
 		</s:controlBarContent>
 	</s:Panel>
