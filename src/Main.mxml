@@ -42,7 +42,7 @@
 			var doorsTotalPrice:Number = 0;
 			if (doorsItemsContainer.numElements > 0)
 			{
-				var oneDoorArea:Number = (baseWidthNStepper.value * baseHeightNStepper.value) / doorsItemsContainer.numElements;
+				var oneDoorArea:Number = baseWidthNStepper.value/ doorsItemsContainer.numElements * baseHeightNStepper.value;
 
 				for (var i:int = 0; i < doorsItemsContainer.numElements; i++)
 				{
@@ -76,7 +76,7 @@
 			totalPriceLabel.text = String(Math.round(resultPrice)) + ' руб.';
 		}
 
-		private function calculateButtonClick(event:MouseEvent):void
+		private function controlValueComit(event:FlexEvent):void
 		{
 			calculate();
 		}
@@ -85,18 +85,30 @@
 		{
 			var doorFormItem:DoorFormItem = new DoorFormItem();
 			doorFormItem.addEventListener(DoorFormItem.REMOVE_BUTTON_CLICK, onRemoveDoorButtonClick);
+			doorFormItem.addEventListener(FlexEvent.VALUE_COMMIT, onDoorItemValueCommit);
 			doorsItemsContainer.addElement(doorFormItem);
 
 			refreshDoorsLabel();
+
+			//calculate();
+		}
+
+		private function onDoorItemValueCommit(event:FlexEvent):void
+		{
+			calculate();
 		}
 
 		private function onRemoveDoorButtonClick(event:Event):void
 		{
-			var formItem:FormItem = event.currentTarget as FormItem;
+			var doorFormItem:DoorFormItem = event.currentTarget as DoorFormItem;
+			doorFormItem.removeEventListener(DoorFormItem.REMOVE_BUTTON_CLICK, onRemoveDoorButtonClick);
+			doorFormItem.removeEventListener(FlexEvent.VALUE_COMMIT, onDoorItemValueCommit);
 
-			doorsItemsContainer.removeElement(formItem);
+			doorsItemsContainer.removeElement(doorFormItem);
 
 			refreshDoorsLabel();
+
+			calculate();
 		}
 
 		private function refreshDoorsLabel():void
@@ -151,51 +163,50 @@
 
 		<s:Scroller>
 			<s:Group id="formContainer" width="{mainPanel.contentGroup.width}" height="{mainPanel.contentGroup.height}">
+
 				<s:Form width="100%">
 
 					<s:FormItem id="baseWidthFItem" label="Длина шкафа общая, см*:">
-						<s:NumericStepper id="baseWidthNStepper" minimum="0" maximum="100000"/>
+						<s:NumericStepper id="baseWidthNStepper" minimum="0" maximum="100000" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<s:FormItem id="baseHeightFItem" label="Высотка шкафа, см*:">
-						<s:NumericStepper id="baseHeightNStepper" minimum="0" maximum="100000"/>
+						<s:NumericStepper id="baseHeightNStepper" minimum="0" maximum="100000" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<s:FormItem id="baseDepthFItem" label="Глубина шкафа, см*:">
-						<s:NumericStepper id="baseDepthNStepper" minimum="0" maximum="100000"/>
+						<s:NumericStepper id="baseDepthNStepper" minimum="0" maximum="100000" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<mx:HRule width="100%"/>
 
 					<s:FormItem id="doorsFItem" label="Двери">
-						<!--<s:NumericStepper id="doorsNStepper" minimum="0" maximum="10" value="1" valueCommit="doorsNStepper_valueCommit(event)" />-->
 						<s:Button label="добавить дверь" alpha="0.6" click="addDoorButtonClick(event)" />
 						<s:VGroup id="doorsItemsContainer"/>
 					</s:FormItem>
 
 					<mx:HRule width="100%"/>
 
-					<s:FormItem id="rackFItem" label=" Количество вертикальных стоек, шт.">
-						<s:NumericStepper id="rackNStepper" minimum="0" maximum="60"/>
+					<s:FormItem id="rackFItem" label="Количество вертикальных стоек, шт.">
+						<s:NumericStepper id="rackNStepper" minimum="0" maximum="60" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<s:FormItem id="shelfFItem" label="Количество полок, шт.">
-						<s:NumericStepper id="shelfNStepper" minimum="0" maximum="40"/>
+						<s:NumericStepper id="shelfNStepper" minimum="0" maximum="40" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<s:FormItem id="drawefFItem" label="Количество ящиков, шт.">
-						<s:NumericStepper id="drawerNStepper" minimum="0" maximum="40"/>
+						<s:NumericStepper id="drawerNStepper" minimum="0" maximum="40" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<mx:HRule width="100%"/>
 
-					<s:FormItem label="Какие из следующих аксессуаров и приятных мелочей включить в рассчет?:">
+					<s:FormHeading label="Какие из следующих аксессуаров и приятных мелочей включить в рассчет?:"/>
+					<s:FormItem>
 						<s:layout>
 							<s:VerticalLayout/>
 						</s:layout>
-						<s:CheckBox id="backlightCheckbox" label="Подсветка из 3-х ламп" />
-						<s:CheckBox label="???" />
-						<s:CheckBox label="???" />
+						<s:CheckBox id="backlightCheckbox" label="Подсветка из 3-х ламп" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<mx:HRule width="100%"/>
@@ -213,7 +224,7 @@
 		<s:controlBarContent>
 			<s:HGroup width="100%">
 				<mx:Spacer width="100%"/>
-				<s:Button label="Рассчитать" click="calculateButtonClick(event)" />
+				<!--<s:Button label="Рассчитать" click="calculateButtonClick(event)" />-->
 			</s:HGroup>
 		</s:controlBarContent>
 	</s:Panel>
