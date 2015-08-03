@@ -2,7 +2,7 @@
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
                        xmlns:s="library://ns.adobe.com/flex/spark"
                        xmlns:mx="library://ns.adobe.com/flex/mx"
-					   width="700" height="700"
+					   width="700" height="600"
 					   initialize="windowedapplication_initializeHandler(event)">
 	<fx:Script>
 		<![CDATA[
@@ -16,41 +16,58 @@
 		import spark.components.Button;
 		import spark.components.DropDownList;
 		import spark.components.FormItem;
+		import spark.components.NumericStepper;
 		import spark.layouts.HorizontalLayout;
 		import spark.layouts.supportClasses.LayoutBase;
 		import spark.layouts.VerticalLayout;
+		import view.DoorFormItem;
 
-		private const CARCASS_PRICE:Number = 0.29; // копус (см2)
-		private const DOOR_CARCASS_PRICE:Number = 2784; // корпус двери (шт)
+		private const BASE_MATERIAL_PRICE:Number = 0.075; // копус (см2)
+		private const DOOR_CARCASS_PRICE:Number = 4500; // корпус двери (шт)
 		private const RACK_PRICE:Number = 1028; // стойка (шт)
 		private const SHELF_PRICE:Number = 386; // полка (шт)
 		private const DRAWER_PRICE:Number = 948; // ящик (шт)
-		private const BACKLIGHT_PRICE:Number = 740; // подсветка (за 3 штуки)
 
-		public static const DOOR_TYPES:ArrayCollection = new ArrayCollection([
-			new DoorMaterialData("ДСП", 0.29 /*(см2)*/),
-			new DoorMaterialData("Зеркало", 0.60 /*(см2)*/)
+		private const ANGULAR_SECTOR_PRICE:Number = 1900; // угловой сектор (шт)
+		private const CLOTHES_RAIL_PRICE:Number = 350; // штанга для одежды (шт)
+
+		private const BACKLIGHT_PRICE:Number = 320; // подсветка (шт)
+		private const PONTOGRAF_PRICE:Number = 2500; // понтограф (шт)
+		private const BASKET_PRICE:Number = 700; // корзина для белья (шт)
+		private const HANGER_TROUSERS_PRICE:Number = 1240; // вешалка для брюк (шт)
+		private const HANGER_NECKTIES_PRICE:Number = 1150; // вешалка для галстуков (шт)
+		private const SHELF_SHOES_PRICE:Number = 1209; // полка сетчатая для обуви (шт)
+
+		public static const DOOR_MATERIALS:ArrayCollection = new ArrayCollection([
+			new DoorMaterialData("ЛДСП", 0.055 /*(см2)*/),
+			new DoorMaterialData("Зеркало", 0.07 /*(см2)*/),
+			new DoorMaterialData("Зеркало цветное", 0.09 /*(см2)*/),
+			new DoorMaterialData("Зеркало с узором (пескоструй)", 0.24 /*(см2)*/),
+			new DoorMaterialData("Стекло с пленкой", 0.18 /*(см2)*/),
+			new DoorMaterialData("Стекло с фотовитражем", 0.26 /*(см2)*/)
 		]);
 
 		private function calculate():void
 		{
 			// base
 			var baseArea:Number = 2 * (baseWidthNStepper.value * baseDepthNStepper.value) + 2 * (baseHeightNStepper.value * baseDepthNStepper.value);
-			var basePrice:Number = baseArea * CARCASS_PRICE;
+			var basePrice:Number = baseArea * BASE_MATERIAL_PRICE;
 
 			// doors
 			var doorsTotalPrice:Number = 0;
-			if (doorsItemsContainer.numElements > 0)
+			if (_doorsElements.length > 0)
 			{
-				var oneDoorArea:Number = baseWidthNStepper.value/ doorsItemsContainer.numElements * baseHeightNStepper.value;
+				var oneDoorArea:Number = (baseWidthNStepper.value / _doorsElements.length) * baseHeightNStepper.value;
 
-				for (var i:int = 0; i < doorsItemsContainer.numElements; i++)
+				for (var i:int = 0; i < _doorsElements.length; i++)
 				{
-					var doorItem:DoorFormItem = doorsItemsContainer.getElementAt(i) as DoorFormItem;
-					if (doorItem == null) continue;
+					var doorItem:DoorFormItem = _doorsElements[i];
 
 					var doorTypeData:DoorMaterialData = doorItem.selectedDoorType;
-					doorsTotalPrice += DOOR_CARCASS_PRICE + oneDoorArea * doorTypeData.price;
+					if (doorTypeData != null)
+					{
+						doorsTotalPrice += DOOR_CARCASS_PRICE + oneDoorArea * doorTypeData.price;
+					}
 				}
 			}
 
@@ -64,7 +81,7 @@
 			var drawerPrice:Number = drawerNStepper.value * DRAWER_PRICE;
 
 			// backlight
-			var backlightPrice:Number = (backlightCheckbox.selected) ? BACKLIGHT_PRICE : 0;
+			var backlightPrice:Number = backlightCheckbox.value * BACKLIGHT_PRICE;
 
 			var resultPrice:Number = basePrice
 				+ doorsTotalPrice
@@ -73,7 +90,7 @@
 				+ drawerPrice
 				+ backlightPrice;
 
-			totalPriceLabel.text = String(Math.round(resultPrice)) + ' руб.';
+			totalPriceLabel.text = 'Результат: ' + String(Math.round(resultPrice)) + ' руб.';
 		}
 
 		private function controlValueComit(event:FlexEvent):void
@@ -81,46 +98,46 @@
 			calculate();
 		}
 
-		private function addDoorButtonClick(event:MouseEvent):void
-		{
-			var doorFormItem:DoorFormItem = new DoorFormItem();
-			doorFormItem.addEventListener(DoorFormItem.REMOVE_BUTTON_CLICK, onRemoveDoorButtonClick);
-			doorFormItem.addEventListener(FlexEvent.VALUE_COMMIT, onDoorItemValueCommit);
-			doorsItemsContainer.addElement(doorFormItem);
-
-			refreshDoorsLabel();
-
-			//calculate();
-		}
-
 		private function onDoorItemValueCommit(event:FlexEvent):void
 		{
 			calculate();
 		}
 
-		private function onRemoveDoorButtonClick(event:Event):void
+		private var _doorsElements:Vector.<DoorFormItem> = new Vector.<DoorFormItem>();
+		private function doorsNStepperChanged(event:FlexEvent):void
 		{
-			var doorFormItem:DoorFormItem = event.currentTarget as DoorFormItem;
-			doorFormItem.removeEventListener(DoorFormItem.REMOVE_BUTTON_CLICK, onRemoveDoorButtonClick);
-			doorFormItem.removeEventListener(FlexEvent.VALUE_COMMIT, onDoorItemValueCommit);
+			var i:int;
+			var doorFormItem:DoorFormItem;
 
-			doorsItemsContainer.removeElement(doorFormItem);
+			for (i = 0; i < _doorsElements.length; i++)
+			{
+				_doorsElements[i].removeEventListener(FlexEvent.VALUE_COMMIT, onDoorItemValueCommit);
+				baseForm.removeElement(_doorsElements[i]);
+			}
+			_doorsElements.length = 0;
 
-			refreshDoorsLabel();
+			var startIndex:int = baseForm.getElementIndex(doorsHeading);
+			for (i = 0; i < doorsNStepper.value; i++)
+			{
+				doorFormItem = new DoorFormItem();
+				doorFormItem.label = "Дверь " + (i + 1);
+				doorFormItem.percentWidth = 100;
+				doorFormItem.addEventListener(FlexEvent.VALUE_COMMIT, onDoorItemValueCommit);
+				_doorsElements.push(doorFormItem);
 
-			calculate();
+				baseForm.addElementAt(doorFormItem, ++startIndex);
+			}
 		}
 
-		private function refreshDoorsLabel():void
+		private function baseFormCreationComplete(event:FlexEvent):void
 		{
-			for (var i:int = 0; i < doorsItemsContainer.numElements; i++)
-			{
-				var doorItem:FormItem = doorsItemsContainer.getElementAt(i) as FormItem;
-				if (doorItem != null)
-				{
-					doorItem.label = "Дверь " + (i + 1);
-				}
-			}
+			//for (var i:int = 0; i < baseForm.numElements; i++)
+			//{
+				//if (baseForm.getElementAt(i) is NumericStepper)
+				//{
+					//(baseForm.getElementAt(i) as NumericStepper).mouseChildren = false;
+				//}
+			//}
 		}
 
 		//-----------------------------------------------------------------------------------------------------------------------
@@ -155,8 +172,8 @@
 	<s:Panel id="mainPanel" width="100%" height="100%" title="{APP_TITLE}">
 
 		<s:Scroller width="100%" height="100%">
-			<s:Group id="formContainer">
-				<s:Form width="100%">
+			<s:Group>
+				<s:Form id="baseForm" width="100%" contentCreationComplete="baseFormCreationComplete(event)">
 
 					<s:FormItem id="baseWidthFItem" label="Длина шкафа общая, см*:">
 						<s:NumericStepper id="baseWidthNStepper" minimum="0" maximum="100000" valueCommit="controlValueComit(event)"/>
@@ -172,10 +189,24 @@
 
 					<mx:HRule width="100%"/>
 
-					<s:FormItem id="doorsFItem" label="Двери">
-						<s:Button label="добавить дверь" alpha="0.6" click="addDoorButtonClick(event)" />
-						<s:VGroup id="doorsItemsContainer"/>
+					<s:FormHeading label="Двери"/>
+
+					<s:FormItem label="Количество дверей">
+						<s:NumericStepper id="doorsNStepper" minimum="1" maximum="10" valueCommit="doorsNStepperChanged(event)" />
 					</s:FormItem>
+
+					<s:FormItem label="Профиль">
+						<s:DropDownList width="100%" requireSelection="true">
+							<s:dataProvider>
+								<mx:ArrayCollection>
+									<fx:Object label="Раздвижные (купе)" />
+									<fx:Object label="Распашные" />
+								</mx:ArrayCollection>
+							</s:dataProvider>
+						</s:DropDownList>
+					</s:FormItem>
+
+					<s:FormHeading id="doorsHeading" label="Наполнение дверей"/>
 
 					<mx:HRule width="100%"/>
 
@@ -193,18 +224,39 @@
 
 					<mx:HRule width="100%"/>
 
-					<s:FormHeading label="Какие из следующих аксессуаров и приятных мелочей включить в рассчет?:"/>
-					<s:FormItem>
-						<s:layout>
-							<s:VerticalLayout/>
-						</s:layout>
-						<s:CheckBox id="backlightCheckbox" label="Подсветка из 3-х ламп" valueCommit="controlValueComit(event)"/>
+					<s:FormItem label="Угловой сектор">
+						<s:NumericStepper minimum="0" maximum="10" />
+					</s:FormItem>
+
+					<s:FormItem label="Штанга для одежды">
+						<s:NumericStepper minimum="0" maximum="10" />
 					</s:FormItem>
 
 					<mx:HRule width="100%"/>
 
-					<s:FormItem label="Результат:">
-						<s:Label id="totalPriceLabel" styleName="blueTheme" />
+					<s:FormHeading label="Какие из следующих аксессуаров и приятных мелочей включить в рассчет?:"/>
+					<s:FormItem label="Подсветка из 3-х ламп">
+						<s:NumericStepper id="backlightCheckbox" minimum="0" maximum="10" valueCommit="controlValueComit(event)"/>
+					</s:FormItem>
+
+					<s:FormItem label="Подъемная штанга (понтограф)">
+						<s:NumericStepper minimum="0" maximum="10" />
+					</s:FormItem>
+
+					<s:FormItem label="Корзина для белья">
+						<s:NumericStepper minimum="0" maximum="10" />
+					</s:FormItem>
+
+					<s:FormItem label="Вешалка для брюк">
+						<s:NumericStepper minimum="0" maximum="10" />
+					</s:FormItem>
+
+					<s:FormItem label="Вешалка для галстуков">
+						<s:NumericStepper minimum="0" maximum="10" />
+					</s:FormItem>
+
+					<s:FormItem label="Полка сетчатая для обуви">
+						<s:NumericStepper minimum="0" maximum="10" />
 					</s:FormItem>
 
 					<mx:HRule width="100%"/>
@@ -216,7 +268,7 @@
 		<s:controlBarContent>
 			<s:HGroup width="100%">
 				<mx:Spacer width="100%"/>
-				<!--<s:Button label="Рассчитать" click="calculateButtonClick(event)" />-->
+				<s:Label id="totalPriceLabel" styleName="blueTheme" />
 			</s:HGroup>
 		</s:controlBarContent>
 	</s:Panel>
