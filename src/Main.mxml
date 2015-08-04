@@ -22,13 +22,14 @@
 		import spark.layouts.VerticalLayout;
 		import view.DoorFormItem;
 
-		private const BASE_MATERIAL_PRICE:Number = 0.075; // копус (см2)
-		private const DOOR_CARCASS_PRICE:Number = 4500; // корпус двери (шт)
+		private const BASE_MATERIAL_PRICE:Number = 0.085; // копус (см2)
+		private const DOOR_CARCASS_PRICE:Number = 4800; // корпус двери (шт)
+
 		private const RACK_PRICE:Number = 1028; // стойка (шт)
-		private const SHELF_PRICE:Number = 386; // полка (шт)
+		private const SHELF_PRICE:Number = 430; // полка (шт)
 		private const DRAWER_PRICE:Number = 948; // ящик (шт)
 
-		private const ANGULAR_SECTOR_PRICE:Number = 1900; // угловой сектор (шт)
+		private const ANGULAR_SECTOR_PRICE:Number = 2200; // угловой сектор (шт)
 		private const CLOTHES_RAIL_PRICE:Number = 350; // штанга для одежды (шт)
 
 		private const BACKLIGHT_PRICE:Number = 320; // подсветка (шт)
@@ -39,9 +40,9 @@
 		private const SHELF_SHOES_PRICE:Number = 1209; // полка сетчатая для обуви (шт)
 
 		public static const DOOR_MATERIALS:ArrayCollection = new ArrayCollection([
-			new DoorMaterialData("ЛДСП", 0.055 /*(см2)*/),
-			new DoorMaterialData("Зеркало", 0.07 /*(см2)*/),
-			new DoorMaterialData("Зеркало цветное", 0.09 /*(см2)*/),
+			new DoorMaterialData("ЛДСП", 0.07 /*(см2)*/),
+			new DoorMaterialData("Зеркало", 0.09 /*(см2)*/),
+			new DoorMaterialData("Зеркало цветное", 0.10 /*(см2)*/),
 			new DoorMaterialData("Зеркало с узором (пескоструй)", 0.24 /*(см2)*/),
 			new DoorMaterialData("Стекло с пленкой", 0.18 /*(см2)*/),
 			new DoorMaterialData("Стекло с фотовитражем", 0.26 /*(см2)*/)
@@ -71,24 +72,61 @@
 				}
 			}
 
-			// rack
+			// --
+
+			// стойка
 			var rackPrice:Number = rackNStepper.value * RACK_PRICE;
 
-			// shelf
+			// полка
 			var shelfPrice:Number = shelfNStepper.value * SHELF_PRICE;
 
-			// drawer
+			// ящик
 			var drawerPrice:Number = drawerNStepper.value * DRAWER_PRICE;
 
-			// backlight
+			// --
+
+			// угловой сектор
+			var angularSectorPrice:Number = angularSectorNStepper.value * ANGULAR_SECTOR_PRICE;
+
+			// штанга для одежды
+			var clothesRailPrice:Number = clothesRailNStepper.value * CLOTHES_RAIL_PRICE;
+
+			// --
+
+			// подсветка
 			var backlightPrice:Number = backlightCheckbox.value * BACKLIGHT_PRICE;
+
+			// понтограф
+			var pontografPrice:Number = pontografNStepper.value * PONTOGRAF_PRICE;
+
+			// корзина для белья
+			var basketPrice:Number = basketNStepper.value * BASKET_PRICE;
+
+			// вешалка для брюк
+			var hangerTrousersPrice:Number = hangerTrousersNStepper.value * HANGER_TROUSERS_PRICE;
+
+			// вешалка для галстуков
+			var hangerNecktiesPrice:Number = hangerNecktiesNStepper.value * HANGER_NECKTIES_PRICE;
+
+			// полка сетчатая для обуви
+			var shelfShoesPrice:Number = shelfShoesNStepper.value * SHELF_SHOES_PRICE;
 
 			var resultPrice:Number = basePrice
 				+ doorsTotalPrice
+
 				+ rackPrice
 				+ shelfPrice
 				+ drawerPrice
-				+ backlightPrice;
+
+				+ angularSectorPrice
+				+ clothesRailPrice
+
+				+ backlightPrice
+				+ pontografPrice
+				+ basketPrice
+				+ hangerTrousersPrice
+				+ hangerNecktiesPrice
+				+ shelfShoesPrice;
 
 			totalPriceLabel.text = 'Результат: ' + String(Math.round(resultPrice)) + ' руб.';
 		}
@@ -192,7 +230,7 @@
 					<s:FormHeading label="Двери"/>
 
 					<s:FormItem label="Количество дверей">
-						<s:NumericStepper id="doorsNStepper" minimum="1" maximum="10" valueCommit="doorsNStepperChanged(event)" />
+						<s:NumericStepper id="doorsNStepper" minimum="1" maximum="10" valueCommit="doorsNStepperChanged(event)"/>
 					</s:FormItem>
 
 					<s:FormItem label="Профиль">
@@ -225,38 +263,38 @@
 					<mx:HRule width="100%"/>
 
 					<s:FormItem label="Угловой сектор">
-						<s:NumericStepper minimum="0" maximum="10" />
+						<s:NumericStepper id="angularSectorNStepper" minimum="0" maximum="10" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<s:FormItem label="Штанга для одежды">
-						<s:NumericStepper minimum="0" maximum="10" />
+						<s:NumericStepper id="clothesRailNStepper" minimum="0" maximum="10" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<mx:HRule width="100%"/>
 
 					<s:FormHeading label="Какие из следующих аксессуаров и приятных мелочей включить в рассчет?:"/>
-					<s:FormItem label="Подсветка из 3-х ламп">
+					<s:FormItem label="Подсветка">
 						<s:NumericStepper id="backlightCheckbox" minimum="0" maximum="10" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<s:FormItem label="Подъемная штанга (понтограф)">
-						<s:NumericStepper minimum="0" maximum="10" />
+						<s:NumericStepper id="pontografNStepper" minimum="0" maximum="10" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<s:FormItem label="Корзина для белья">
-						<s:NumericStepper minimum="0" maximum="10" />
+						<s:NumericStepper id="basketNStepper" minimum="0" maximum="10" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<s:FormItem label="Вешалка для брюк">
-						<s:NumericStepper minimum="0" maximum="10" />
+						<s:NumericStepper id="hangerTrousersNStepper" minimum="0" maximum="10" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<s:FormItem label="Вешалка для галстуков">
-						<s:NumericStepper minimum="0" maximum="10" />
+						<s:NumericStepper id="hangerNecktiesNStepper" minimum="0" maximum="10" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<s:FormItem label="Полка сетчатая для обуви">
-						<s:NumericStepper minimum="0" maximum="10" />
+						<s:NumericStepper id="shelfShoesNStepper" minimum="0" maximum="10" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<mx:HRule width="100%"/>
