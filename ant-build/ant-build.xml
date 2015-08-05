@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="hotshot-standalone">
+
+	<property name="SDK_HOME" value="F:/denis/sdks/apache-flex-4.14.1"/>
+	<property name="PROJECT_PATH" value="F:/denis/projects/ud-furniture-calculator"/>
+
+	<property name="AMXML" value="${SDK_HOME}/bin/amxmlc.bat"/>
+	<property name="ADL" value="${SDK_HOME}/bin/adl.exe"/>
+	<property name="ADT" value="${SDK_HOME}/lib/adt.jar"/>
+
+	<!--  			-->
+	<!-- PROPERTIES -->
+	<!--  			-->
+
+	<property name="APP_DESCRIPTOR" value="application.xml"/>
+
+	<property name="DEBUG_MODE" value="true"/>
+	<property name="SITE" value="sb"/>
+	<property name="CERTIFICATE_PASS" value="123"/>
+	<property name="SWF_VERSION" value="18"/>
+
+	<!-- 			 -->
+	<!-- COMPILATION -->
+	<!-- 			 -->
+
+	<target name="compile">
+		<echo>****************** COMPILATION ******************</echo>
+		<exec executable="${AMXML}">
+
+			<arg value="-swf-version=${SWF_VERSION}"/>
+
+			<!-- кого компилим -->
+			<arg value="${PROJECT_PATH}/src/Main.mxml"/>
+
+			<!-- в какой файл компилить -->
+			<arg value="-output"/>
+			<arg value="${PROJECT_PATH}/bin/ud-furniture-calculator.swf"/>
+
+			<arg value="-debug=${DEBUG_MODE}"/>
+		</exec>
+	</target>
+
+	<!-- 		-->
+	<!-- RUN 	-->
+	<!-- 		-->
+
+	<target name="run">
+		<echo>****************** RUN (WAIT...) ******************</echo>
+		<exec executable="${ADL}">
+			<arg value="${PROJECT_PATH}/${APP_DESCRIPTOR}"/>
+			<arg value="${PROJECT_PATH}/bin"/>
+		</exec>
+	</target>
+
+	<!--			-->
+	<!-- PACKAGE 	-->
+	<!-- 			-->
+
+	<target name="package">
+		<echo>****************** PACKAGE (WAIT...) ******************</echo>
+		<java jar="${ADT}" fork="true">
+			<arg value="-package"/>
+
+			<!-- OPTIONS -->
+			<arg value="-tsa"/>
+			<arg value="none"/>
+
+			<!-- SIGNING_OPTIONS -->
+			<arg value="-storetype"/>
+			<arg value="pkcs12"/>
+			<arg value="-keystore"/>
+			<arg value="${PROJECT_PATH}/bat/ud-furniture-calculator.p12"/>
+			<arg value="-storepass"/>
+			<arg value="${CERTIFICATE_PASS}"/>
+
+			<arg value="-target"/>
+			<arg value="bundle"/>
+
+			<!-- OUTPUT -->
+			<arg value="${PROJECT_PATH}/air/ud-furniture-calculator"/>
+
+			<!--APP_XML-->
+			<arg value="${PROJECT_PATH}/${APP_DESCRIPTOR}"/>
+
+			<!--FILE_OR_DIR-->
+			<arg value="-C"/>
+			<arg value="${PROJECT_PATH}/bin"/>
+			<arg value="."/>
+		</java>
+	</target>
+
+	<!--				-->
+	<!-- CERTIFICATE	-->
+	<!-- 				-->
+
+	<target name="create-certificate">
+		<echo>****************** COMPILE.CERTIFICATE (WAIT...) ******************</echo>
+		<java jar="${ADT}" fork="true" failonerror="true">
+			<arg value="-certificate"/>
+			<!-- имя -->
+			<arg value="-cn"/>
+			<arg value="ud-furniture-calculator"/>
+			<!-- тип ключа -->
+			<arg value="2048-RSA"/>
+			<!-- имя файла ключа сертификата -->
+			<arg value="${PROJECT_PATH}/bat/ud-furniture-calculator.p12"/>
+			<!-- пароль -->
+			<arg value="${CERTIFICATE_PASS}"/>
+		</java>
+	</target>
+
+</project>
