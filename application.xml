@@ -2,7 +2,7 @@
 <application xmlns="http://ns.adobe.com/air/application/18.0">
 
 	<id>ud-furniture-calculator</id>
-	<versionNumber>1.2</versionNumber>
+	<versionNumber>1.21</versionNumber>
 	<filename>ud-furniture-calculator</filename>
 
 	<name>ud-furniture-calculator</name>
@@ -16,11 +16,11 @@
 		<transparent>false</transparent>
 		<visible>true</visible>
 		<minimizable>true</minimizable>
-		<maximizable>false</maximizable>
+		<maximizable>true</maximizable>
 		<resizable>true</resizable>
 	</initialWindow>
 
-	<supportedProfiles>extendedDesktop</supportedProfiles>
+	<!--<supportedProfiles>extendedDesktop</supportedProfiles>-->
 
 	<!--
 	More options:
