@@ -22,7 +22,7 @@
 		import spark.layouts.VerticalLayout;
 		import view.DoorFormItem;
 
-		private const BASE_MATERIAL_PRICE:Number = 0.085; // копус (см2)
+		private const BASE_MATERIAL_PRICE:Number = 0.12; // копус (см2)
 		private const DOOR_CARCASS_PRICE:Number = 4800; // корпус двери (шт)
 
 		private const RACK_PRICE:Number = 1028; // стойка (шт)
