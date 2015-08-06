@@ -56,7 +56,37 @@
 	<!-- PACKAGE 	-->
 	<!-- 			-->
 
-	<target name="package">
+	<target name="package (air)">
+		<echo>****************** PACKAGE (WAIT...) ******************</echo>
+		<java jar="${ADT}" fork="true">
+			<arg value="-package"/>
+
+			<!-- OPTIONS -->
+			<arg value="-tsa"/>
+			<arg value="none"/>
+
+			<!-- SIGNING_OPTIONS -->
+			<arg value="-storetype"/>
+			<arg value="pkcs12"/>
+			<arg value="-keystore"/>
+			<arg value="${PROJECT_PATH}/bat/ud-furniture-calculator.p12"/>
+			<arg value="-storepass"/>
+			<arg value="${CERTIFICATE_PASS}"/>
+
+			<!-- OUTPUT -->
+			<arg value="${PROJECT_PATH}/air/ud-furniture-calculator.air"/>
+
+			<!--APP_XML-->
+			<arg value="${PROJECT_PATH}/${APP_DESCRIPTOR}"/>
+
+			<!--FILE_OR_DIR-->
+			<arg value="-C"/>
+			<arg value="${PROJECT_PATH}/bin"/>
+			<arg value="."/>
+		</java>
+	</target>
+
+	<target name="package (bundle)">
 		<echo>****************** PACKAGE (WAIT...) ******************</echo>
 		<java jar="${ADT}" fork="true">
 			<arg value="-package"/>
