@@ -38,8 +38,11 @@
 		private const HANGER_TROUSERS_PRICE:Number = 1240; // вешалка для брюк (шт)
 		private const HANGER_NECKTIES_PRICE:Number = 1150; // вешалка для галстуков (шт)
 		private const SHELF_SHOES_PRICE:Number = 1209; // полка сетчатая для обуви (шт)
+		private const SOFT_DOOR_CLOSER_PRICE:Number = 700; // мягкий доводчик двери (шт)
+		private const SOFT_DRAWER_CLOSER_PRICE:Number = 500; // мягкий доводчик ящиков (шт)
 
 		public static const DOOR_MATERIALS:ArrayCollection = new ArrayCollection([
+			new DoorMaterialData("--", 0),
 			new DoorMaterialData("ЛДСП", 0.07 /*(см2)*/),
 			new DoorMaterialData("Зеркало", 0.09 /*(см2)*/),
 			new DoorMaterialData("Зеркало цветное", 0.10 /*(см2)*/),
@@ -62,12 +65,13 @@
 
 				for (var i:int = 0; i < _doorsElements.length; i++)
 				{
-					var doorItem:DoorFormItem = _doorsElements[i];
+					doorsTotalPrice += DOOR_CARCASS_PRICE;
 
+					var doorItem:DoorFormItem = _doorsElements[i];
 					var doorTypeData:DoorMaterialData = doorItem.selectedDoorType;
 					if (doorTypeData != null)
 					{
-						doorsTotalPrice += DOOR_CARCASS_PRICE + oneDoorArea * doorTypeData.price;
+						doorsTotalPrice += oneDoorArea * doorTypeData.price;
 					}
 				}
 			}
@@ -111,6 +115,12 @@
 			// полка сетчатая для обуви
 			var shelfShoesPrice:Number = shelfShoesNStepper.value * SHELF_SHOES_PRICE;
 
+			// мягкий доводчик двери
+			var softDoorCloserPrice:Number = softDoorCloserNStepper.value * SOFT_DOOR_CLOSER_PRICE;
+
+			// мягкий доводчик ящиков
+			var softDrawerCloserPrice:Number = softDrawerCloserNStepper.value * SOFT_DRAWER_CLOSER_PRICE;
+
 			var resultPrice:Number = basePrice
 				+ doorsTotalPrice
 
@@ -126,7 +136,9 @@
 				+ basketPrice
 				+ hangerTrousersPrice
 				+ hangerNecktiesPrice
-				+ shelfShoesPrice;
+				+ shelfShoesPrice
+				+ softDoorCloserPrice
+				+ softDrawerCloserPrice;
 
 			totalPriceLabel.text = 'Результат: ' + String(Math.round(resultPrice)) + ' руб.';
 		}
@@ -165,6 +177,8 @@
 
 				baseForm.addElementAt(doorFormItem, ++startIndex);
 			}
+
+			calculate();
 		}
 
 		private function baseFormCreationComplete(event:FlexEvent):void
@@ -230,7 +244,7 @@
 					<s:FormHeading label="Двери"/>
 
 					<s:FormItem label="Количество дверей">
-						<s:NumericStepper id="doorsNStepper" minimum="1" maximum="10" valueCommit="doorsNStepperChanged(event)"/>
+						<s:NumericStepper id="doorsNStepper" minimum="0" maximum="10" valueCommit="doorsNStepperChanged(event)"/>
 					</s:FormItem>
 
 					<s:FormItem label="Профиль">
@@ -295,6 +309,14 @@
 
 					<s:FormItem label="Полка сетчатая для обуви">
 						<s:NumericStepper id="shelfShoesNStepper" minimum="0" maximum="10" valueCommit="controlValueComit(event)"/>
+					</s:FormItem>
+
+					<s:FormItem label="Двери мягкого закрывания (доводчик)">
+						<s:NumericStepper id="softDoorCloserNStepper" minimum="0" maximum="10" valueCommit="controlValueComit(event)"/>
+					</s:FormItem>
+
+					<s:FormItem label="Ящики мягкого закрывания (доводчик)">
+						<s:NumericStepper id="softDrawerCloserNStepper" minimum="0" maximum="10" valueCommit="controlValueComit(event)"/>
 					</s:FormItem>
 
 					<mx:HRule width="100%"/>
