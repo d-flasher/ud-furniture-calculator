@@ -40,6 +40,7 @@
 		private const SHELF_SHOES_PRICE:Number = 1209; // полка сетчатая для обуви (шт)
 
 		public static const DOOR_MATERIALS:ArrayCollection = new ArrayCollection([
+			new DoorMaterialData("--", 0),
 			new DoorMaterialData("ЛДСП", 0.07 /*(см2)*/),
 			new DoorMaterialData("Зеркало", 0.09 /*(см2)*/),
 			new DoorMaterialData("Зеркало цветное", 0.10 /*(см2)*/),
@@ -165,6 +166,8 @@
 
 				baseForm.addElementAt(doorFormItem, ++startIndex);
 			}
+
+			calculate();
 		}
 
 		private function baseFormCreationComplete(event:FlexEvent):void
@@ -230,7 +233,7 @@
 					<s:FormHeading label="Двери"/>
 
 					<s:FormItem label="Количество дверей">
-						<s:NumericStepper id="doorsNStepper" minimum="1" maximum="10" valueCommit="doorsNStepperChanged(event)"/>
+						<s:NumericStepper id="doorsNStepper" minimum="0" maximum="10" valueCommit="doorsNStepperChanged(event)"/>
 					</s:FormItem>
 
 					<s:FormItem label="Профиль">
