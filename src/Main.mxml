@@ -63,12 +63,13 @@
 
 				for (var i:int = 0; i < _doorsElements.length; i++)
 				{
-					var doorItem:DoorFormItem = _doorsElements[i];
+					doorsTotalPrice += DOOR_CARCASS_PRICE;
 
+					var doorItem:DoorFormItem = _doorsElements[i];
 					var doorTypeData:DoorMaterialData = doorItem.selectedDoorType;
 					if (doorTypeData != null)
 					{
-						doorsTotalPrice += DOOR_CARCASS_PRICE + oneDoorArea * doorTypeData.price;
+						doorsTotalPrice += oneDoorArea * doorTypeData.price;
 					}
 				}
 			}
